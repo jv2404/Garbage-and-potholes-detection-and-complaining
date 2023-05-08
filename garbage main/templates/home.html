@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Garbage detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <style>
+
+.hero {
+    background: black url(static/images/cat_dog3.jpg) center / cover;
+}
+    </style>
+
+  </head>
+
+    
+<body>
+
+<!-- .hero -->
+<section class="hero is-fullheight" has-background-black>
+
+    <section class="section">
+        <div class="container">
+            <h1>
+               <STRONG> GARBAGE DETECTION </strong>
+            </h1>
+            <p class="subsubtitle">
+                BY <strong> bot-vedant </strong>
+            </p>
+        </div>   
+    </section> 
+
+
+    <section class="section">
+        <div class="container has-text-centered bg-text" style="width: 100%">
+                <p class="subtitle" style="color:black">
+                 <strong> Upload your complain </strong>
+                </p>
+              <div>
+                <i class="arrow_down"></i>
+                <form action="/classify" method="post" enctype="multipart/form-data" style="margin-top: 30px; width: 80%; text-align: center; margin: auto;">
+                  <div class="file has-name is-centered">     
+                      <label class="file-label">
+                        <input class="file-input" type="file" id="image" name = "image">
+                        <span class="file-cta">
+                          <span class="file-label">
+                            Upload an image
+                          </span>
+                        </span>
+                        <span class="file-name" id="file-name">
+                          No file chosen
+                        </span>
+      
+                      </label>
+                    </div>
+                    <br>
+                    <input type="submit" value="COMPLAIN" class="button is-black" name = "image" id="classify_button">
+                </form>
+      
+                </div>
+               
+              </div>
+            </div>
+        </div>
+        <div class="container has-text-centered bg-text" style="width: 100%">
+            <p class="subtitle" style="color:black">
+                <strong>Check your complaint status</strong>
+            </p>
+            <div>
+                <form method="POST" style="margin-top: 30px; width: 22%; text-align: center; margin: auto;">
+                    <div class="field is-grouped">
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Enter your complaint ID" name="complaint_id">
+                        </div>
+                       <div><input type="submit" value="Submit"class="button is-black"></div>
+                    </div>
+                </form>
+                 {% if status %}
+                    <p><strong>your complaint is {{ status }}</strong> </p>
+                 {% endif %}
+            </div>
+        </div>
+      
+</section>
+
+
+
+
+
+<!-- .section -->
+<section class="bd-footer-link">
+        <div class="container">
+            <div class="columns">
+                <div class="column">
+                        
+                            <div class="media-content">
+                                <div class="content">
+                                    <p class="subsubtitle">
+                                    <strong>Contact Us: +91 82866 15399</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                <div class="column">
+                    
+                        <div class="media-content">
+                            <div class="content">
+                                <div class="columns">
+                                    <div class="column">
+                                        <a class="navbar-item" href="https://www.linkedin.com/in">
+                                            <figure class="media-content">
+                                                    <span class="icon">
+                                                        <i class="fab fa-lg fa-linkedin"></i>
+                                                    </span>
+                                            </figure>
+                                        </a>
+                                    </div>
+                                    <div class="column">
+                                        <a class="navbar-item" href="https://github.com/bot-veda">
+                                            <figure class="media-content">
+                                                    <span class="icon">
+                                                        <i class="fab fa-lg fa-github"></i>
+                                                    </span>
+                                            </figure>
+                                        </a>
+                                    </div>
+                                    <div class="column">
+                                        <a class="navbar-item" href="mailto:if1905630374@gmail.com">
+                                            <figure class="media-content">
+                                                    <span class="icon">
+                                                        <i class="fas fa-lg fa-envelope-open-text"></i>
+                                                    </span>
+                                            </figure>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>    
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.section -->
+<!-- /.hero -->
+
+
+<script src="/static/script.js"></script>
+</body>
+</html>
