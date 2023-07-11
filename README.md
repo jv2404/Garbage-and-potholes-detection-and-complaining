@@ -2,7 +2,7 @@
 
 ## FLASK APPLICATION
 ### Homepage
-![](https://github.com/jv2404/Garbage-and-potholes-detection-and-complaining/blob/main/Screenshot%20(26).png)
+![](https://github.com/jv2404/Garbage-and-potholes-detection-and-complaining/blob/main/Screenshot%20(16).png)
 ### Example of results
 
 ![Complaining Exemple](https://github.com/jv2404/Garbage-and-potholes-detection-and-complaining/blob/main/Screenshot%20(11).png)
