@@ -1,0 +1,134 @@
+import os
+import numpy as np
+from keras.layers import Dense, Flatten
+from keras.models import Model
+from keras.applications.inception_v3 import InceptionV3, preprocess_input
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+import keras
+import requests
+import tensorflow as tf
+from flask import Flask, render_template, request, send_from_directory
+import mysql.connector
+import random
+from datetime import datetime
+
+app = Flask(__name__)
+dir_path = os.path.dirname(os.path.realpath(__file__))
+UPLOAD_FOLDER = "images"
+STATIC_FOLDER = "static"
+
+# Load model
+cnn_model = tf.keras.models.load_model(STATIC_FOLDER + "/models/" + "best_model.h5")
+
+# Connect to MySQL database
+db = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="",
+  database="data"
+)
+
+# Create a table to store image filename, user location, prediction label, and image file
+cursor = db.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS predictions (id INT AUTO_INCREMENT PRIMARY KEY, filename VARCHAR(255), location VARCHAR(255), prediction VARCHAR(255), image BLOB, status VARCHAR(255), complaint_id INT(10))")
+
+# Define a function to get location based on user input or geolocation
+def get_location(user_input=None, lat=None, lng=None):
+    # Replace with your API key and endpoint
+    api_key =  '888a6c7eca0a4da99b813824bdef7e0e'
+    endpoint = 'https://ipgeolocation.abstractapi.com/v1/?api_key=888a6c7eca0a4da99b813824bdef7e0e'  # Replace with the actual API endpoint
+
+    # api_key = 'XwF90wsr5omLFYfzTBKB17Ow5Cvqvf49iuFZOZoBHa4'
+    # endpoint = 'https://geocode.search.hereapi.com/v1/geocode?apiKey={XwF90wsr5omLFYfzTBKB17Ow5Cvqvf49iuFZOZoBHa4}'
+    # Prepare the parameters for the API request
+    params = {}
+
+    if user_input:
+        params['address'] = user_input
+    elif lat and lng:
+        params['lat'] = lat
+        params['lng'] = lng
+
+    # Make the API request
+    response = requests.get(endpoint, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        # Extract the location data from the API response
+        location = data.get('location')
+        return location
+    else:
+        return None
+
+# Preprocess an image
+
+# home page
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'POST':
+        complaint_id = request.form['complaint_id']
+        
+        # Connect to the database and fetch the status for the customer
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="data"
+        )
+        cursor = db.cursor()
+        cursor.execute("SELECT status FROM predictions WHERE complaint_id=%s", (complaint_id,))
+        status = cursor.fetchone()[0]
+        
+        # Do something with the data and status
+    else:
+        # Display the form
+        status = ''
+    
+    return render_template('home.html', status=status)
+
+@app.route("/classify", methods=["POST", "GET"])
+def upload_file():
+    imagefile = request.files['image']
+    image_path = "./images/"+ imagefile.filename
+    imagefile.save(image_path)
+    with open(image_path, 'rb') as f:
+        image_data = f.read()
+    
+    # Get user location from the API
+    user_location = get_location(user_input=request.form.get('user_location'))
+    
+    if user_location:
+        location = f"{user_location['latitude']}, {user_location['longitude']}"
+    else:
+        location = "Location data not available"
+    
+    imgage = load_img(image_path, target_size=(256, 256))
+    i = img_to_array(imgage)
+    i = preprocess_input(i)
+    input_arr = np.array([i])
+    input_arr.shape
+    pred = np.argmax(cnn_model.predict(input_arr))
+    if pred == 0:
+        lab = "garbage"
+        label="we have successfully received your request for cleaning garbage"
+    else:
+        lab = "potholes"
+        label="we have successfully received your request for repairing"
+    # Get current date and time as complaint_id
+    now = datetime.now()
+    complaint_id = now.strftime("%m%d") + str(np.random.randint(1000, 9999))
+    
+    # Insert image filename, user location, prediction label, and image file into the database
+    cursor.execute("INSERT INTO predictions (filename, location, prediction, image ,complaint_id) VALUES (%s, %s, %s, %s, %s)", (imagefile.filename, location, lab, image_data, complaint_id))
+    db.commit()
+    return render_template(
+        "classify.html", image_file_name=imagefile.filename, label=label, complaint_id=f"Your complaint ID is {complaint_id}."
+    )
+
+@app.route("/classify/<filename>")
+def send_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+if __name__ == "__main__":
+    app.debug = True
+    app.run(debug=True)
