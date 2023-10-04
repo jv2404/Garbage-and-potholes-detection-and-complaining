@@ -47,7 +47,7 @@
 		echo '</select>';
 		echo '</form>';
 		echo '<table>';
-		echo '<tr><th>Image</th><th>Filename</th><th>Location</th><th>COMPLIANS</th><th>Status</th></tr>';
+		echo '<tr><th>Image</th><th>Filename</th><th>Location</th><th>COMPLIANS</th><th>Complaint_id</th><th>Status</th></tr>';
 		while ($row = mysqli_fetch_assoc($result)) {
 			$image_data = base64_encode($row["image"]);
 			echo '<tr>';
@@ -55,6 +55,7 @@
 			echo '<td>'.$row["filename"].'</td>';
 			echo '<td>'.$row["location"].'</td>';
 			echo '<td>'.$row["prediction"].'</td>';
+			echo '<td>'.$row["complaint_id"].'</td>';
 			echo '<td><select onchange="updateStatus(this, '.$row["id"].')">';
 			echo '<option value="not_seen" '.($row["status"]=='not_seen'?'selected':'').'>Not Seen</option>';
 			echo '<option value="work_in_progress" '.($row["status"]=='work_in_progress'?'selected':'').'>Work In Progress</option>';
@@ -68,31 +69,49 @@
 	}
 	mysqli_close($db);
 ?>
-
 <style>
-	table {
-		border-collapse: collapse;
-		width: 100%;
-	}
-	th, td {
-		padding: 8px;
-		text-align: left;
-		border-bottom: 1px solid #ddd;
-	}
-	th {
-		background-color: #f2f2f2;
-		color: #333;
-	}
-	tr:hover {
-		background-color: #f5f5f5;
-	}
-	img {
-		width: 100px;
-		height: 100px;
-		object-fit: cover;
-		cursor: pointer;
-	}
+    /* Existing styles */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    /* New styles */
+    form {
+        margin-bottom: 20px;
+    }
+    label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    select {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    select:hover {
+        border-color: #333;
+    }
 </style>
+
 <script>
 function updateStatus(select, id) {
     var status = select.value;
